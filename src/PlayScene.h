@@ -7,6 +7,7 @@
 #include "Player.h"
 #include "Button.h"
 #include "Label.h"
+#include "Particle.h"
 
 class PlayScene : public Scene
 {
@@ -27,8 +28,9 @@ private:
 	
 	glm::vec2 m_mousePosition;
 
-	Plane* m_pPlaneSprite;
-	Player* m_pPlayer;
+	Particle* m_pParticle;
+	//Plane* m_pPlaneSprite;
+	//Player* m_pPlayer;
 	bool m_playerFacingRight;
 
 	// UI Items
