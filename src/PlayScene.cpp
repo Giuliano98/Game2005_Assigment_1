@@ -24,7 +24,24 @@ void PlayScene::draw()
 
 void PlayScene::update()
 {
+	float dt = Game::Instance().getDeltaTime();
+	t += dt;
+
 	updateDisplayList();
+
+	xi = m_pParticle->getTransform()->position.x;
+	yi = m_pParticle->getTransform()->position.y;
+
+	xf = xi + vx * dt;
+	yf = yi + vy * dt + 0.5f * g * pow(dt, 2);
+
+	vy += g * dt;
+
+	//y = c + (v * t) + (a * pow(t, 2));
+
+	m_pParticle->getTransform()->position = glm::vec2(xf, yf);
+
+
 }
 
 void PlayScene::clean()
@@ -69,9 +86,9 @@ void PlayScene::start()
 
 	m_pParticle = new Particle();
 	addChild(m_pParticle);
-	m_pParticle->getTransform()->position = glm::vec2(200, 200);
+	m_pParticle->getTransform()->position = glm::vec2(100, 400);
 
-
+	 
 
 	// Back Button
 	m_pBackButton = new Button("../Assets/textures/backButton.png", "backButton", BACK_BUTTON);
