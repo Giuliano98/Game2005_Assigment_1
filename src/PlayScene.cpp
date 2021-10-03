@@ -38,16 +38,17 @@ void PlayScene::update()
 {
 	updateDisplayList();
 
-	if (startFlag)
+	if (startFlag)	// check if user start the movement
 	{
-		// pre-calculing varibles
+		
 		float dt = Game::Instance().getDeltaTime();
 		t += dt;	// gets a estimate time in seconds
 
+		// gets the velocity in X and Y
 		Vx = cos(-launchAng * DEG_TO_RADIANS) * v;
 		Vy = sin(-launchAng * DEG_TO_RADIANS) * v;
 
-		// finding final position
+		// finding final position after "t" seconds
 		xf = xi + Vx * t;
 		yf = yi + Vy * t + (0.5f * g * pow(t, 2));
 
@@ -84,14 +85,16 @@ void PlayScene::handleEvents()
 
 	if (EventManager::Instance().isKeyDown(SDL_SCANCODE_R))
 	{
+		// Restart the particule 
 		t = 0.0f;
-		m_pParticle->getTransform()->position.x = 100.0f;
-		m_pParticle->getTransform()->position.y = 500.0f;
+		m_pParticle->getTransform()->position.x = 150.0f;
+		m_pParticle->getTransform()->position.y = 450.0f;
 
 		startFlag = false;
 	}
 	if (EventManager::Instance().isKeyDown(SDL_SCANCODE_S))
 	{
+		// check if the user pressed "S" for starting the simulation
 		startFlag = true;
 	}
 }
@@ -104,7 +107,7 @@ void PlayScene::start()
 
 	m_pParticle = new Particle();
 	addChild(m_pParticle);
-	m_pParticle->getTransform()->position = glm::vec2(100, 500);
+	m_pParticle->getTransform()->position = glm::vec2(150, 450);
 	xi = m_pParticle->getTransform()->position.x;
 	yi = m_pParticle->getTransform()->position.y;
 	 
