@@ -11,6 +11,11 @@
 PlayScene::PlayScene()
 {
 	PlayScene::start();
+	TextureManager::Instance().load("../Assets/textures/A1_background.png", "bg");
+
+	auto size = TextureManager::Instance().getTextureSize("bg");
+	setWidth(size.x);
+	setHeight(size.y);
 }
 
 PlayScene::~PlayScene()
@@ -18,10 +23,12 @@ PlayScene::~PlayScene()
 
 void PlayScene::draw()
 {
+	TextureManager::Instance().draw("bg",
+		getTransform()->position.x, getTransform()->position.y, 0, 255, false);
 	drawDisplayList();
 
-	SDL_SetRenderDrawColor(Renderer::Instance().getRenderer(), 0, 255, 0, 255);
-	SDL_RenderDrawLine(Renderer::Instance().getRenderer(), xi, yi, xi + 485, yi);
+	SDL_SetRenderDrawColor(Renderer::Instance().getRenderer(), 255, 0, 0, 255);
+	SDL_RenderDrawLine(Renderer::Instance().getRenderer(), xi, yi, xi + d, yi);
 
 	// ----------------------------
 	SDL_SetRenderDrawColor(Renderer::Instance().getRenderer(), 255, 255, 255, 255);
@@ -29,19 +36,25 @@ void PlayScene::draw()
 
 void PlayScene::update()
 {
-	// pre-calculing varibles
-	float dt = Game::Instance().getDeltaTime();
-	t += dt;	// gets a estimate of seconds 
-
 	updateDisplayList();
-	
-	
-	//std::cout << t << std::endl;
-	// finding final position
-	xf = xi + Vx * t;
-	yf = yi + Vy * t + g * 0.5f * pow(t, 2);
 
-	m_pParticle->getTransform()->position = glm::vec2(xf, yf);
+	if (startFlag)
+	{
+		// pre-calculing varibles
+		float dt = Game::Instance().getDeltaTime();
+		t += dt;	// gets a estimate time in seconds
+
+		Vx = cos(-launchAng * DEG_TO_RADIANS) * v;
+		Vy = sin(-launchAng * DEG_TO_RADIANS) * v;
+
+		// finding final position
+		xf = xi + Vx * t;
+		yf = yi + Vy * t + (0.5f * g * pow(t, 2));
+
+		// updating new position
+		m_pParticle->getTransform()->position = glm::vec2(xf, yf);
+	}
+
 }
 
 void PlayScene::clean()
@@ -67,7 +80,20 @@ void PlayScene::handleEvents()
 	if (EventManager::Instance().isKeyDown(SDL_SCANCODE_2))
 	{
 		TheGame::Instance().changeSceneState(END_SCENE);
-	}	
+	}
+
+	if (EventManager::Instance().isKeyDown(SDL_SCANCODE_R))
+	{
+		t = 0.0f;
+		m_pParticle->getTransform()->position.x = 100.0f;
+		m_pParticle->getTransform()->position.y = 500.0f;
+
+		startFlag = false;
+	}
+	if (EventManager::Instance().isKeyDown(SDL_SCANCODE_S))
+	{
+		startFlag = true;
+	}
 }
 
 void PlayScene::start()
@@ -78,17 +104,23 @@ void PlayScene::start()
 
 	m_pParticle = new Particle();
 	addChild(m_pParticle);
-	m_pParticle->getTransform()->position = glm::vec2(100, 400);
+	m_pParticle->getTransform()->position = glm::vec2(100, 500);
 	xi = m_pParticle->getTransform()->position.x;
 	yi = m_pParticle->getTransform()->position.y;
 	 
+
+	/* Labels */
+	m_pStart = new Label("Press (S) to start the motion", "Consolas");
+	m_pStart->getTransform()->position = glm::vec2(Config::SCREEN_WIDTH * 0.5f, 300.0f);
+	addChild(m_pStart);
+
+	m_pRestart = new Label("Press (R) to Restart the level motion", "Consolas");
+	m_pRestart->getTransform()->position = glm::vec2(Config::SCREEN_WIDTH * 0.5f, 200.0f);
+	addChild(m_pRestart);
 	
-
-	/* Instructions Label */
-	/*m_pInstructionsLabel = new Label("Press the backtick (`) character to toggle Debug View", "Consolas");
+	m_pInstructionsLabel = new Label("Press (`) to toggle Debug View", "Consolas");
 	m_pInstructionsLabel->getTransform()->position = glm::vec2(Config::SCREEN_WIDTH * 0.5f, 500.0f);
-
-	addChild(m_pInstructionsLabel);*/
+	addChild(m_pInstructionsLabel);
 
 	ImGuiWindowFrame::Instance().setGUIFunction(std::bind(&PlayScene::GUI_Function, this));
 }
@@ -101,31 +133,22 @@ void PlayScene::GUI_Function()
 	// See examples by uncommenting the following - also look at imgui_demo.cpp in the IMGUI filter
 	//ImGui::ShowDemoWindow();
 	
-	ImGui::Begin("Your Window Title Goes Here", NULL, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoMove);
+	ImGui::Begin("Assignment 1", NULL, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoMove);
 
-	ImGui::SliderFloat("Launch Angle", &launchAng, -90.f, 180.0f, "%.1f,");
+	ImGui::SliderFloat("IniPos X", &xi, 50.0f, 750.0f, "%.1f,");
+	ImGui::SliderFloat("IniPos Y", &yi, 50.0f, 550.0f, "%.1f,");
+
+	ImGui::Separator();
 	ImGui::SliderFloat("Velocity", &v, 0.f, 100.0f, "%.1f,");
-	//ImGui::SliderFloat("Start Point", &xi, 0.f, 100.0f, "%.1f,");
+	ImGui::SliderFloat("Launch Angle", &launchAng, 0.0f, 90.0f, "%.1f,");
+
+	ImGui::Separator();
 	ImGui::SliderFloat("Gravity", &g, -5.0f, 20.0f, "%.1f,");
+	ImGui::SliderFloat("Distance", &d, 0.0f, 600, "%.1f,");
 
 	ImGui::Separator();
 	ImGui::SliderFloat("Time", &t, -10.f, 100.0f, "%.1f,");
-
-	/*if(ImGui::Button("My Button"))
-	{
-		std::cout << "My Button Pressed" << std::endl;
-	}
-
-	ImGui::Separator();
-
-	static float float3[3] = { 0.0f, 1.0f, 1.5f };
-	if(ImGui::SliderFloat3("My Slider", float3, 0.0f, 2.0f))
-	{
-		std::cout << float3[0] << std::endl;
-		std::cout << float3[1] << std::endl;
-		std::cout << float3[2] << std::endl;
-		std::cout << "---------------------------\n";
-	}*/
 	
+	// ------------------------------------
 	ImGui::End();
 }

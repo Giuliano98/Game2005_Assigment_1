@@ -30,10 +30,7 @@ private:
 	glm::vec2 m_mousePosition;
 
 	Particle* m_pParticle;
-	/*float t = 0.0f;
-	float c = 500;
-	float v = -100;
-	float a = 10;*/
+	// particle's variables
 	const float DEG_TO_RADIANS = (double)M_PI / (double)180.0;
 	float t = 0.0f;
 	float v = 95.0f;
@@ -44,20 +41,22 @@ private:
 	float yi = 0.0f;
 	float yf = 0.0f;
 	float launchAng = 15.901f;
-	float Vx = cos(-launchAng * DEG_TO_RADIANS) * v; // 91~
-	float Vy = sin(-launchAng * DEG_TO_RADIANS) * v; // -26~
+	float Vx = 0.0f; 
+	float Vy = 0.0f; 
 	
-
-	bool flag = false;
-
-	//Plane* m_pPlaneSprite;
-	//Player* m_pPlayer;
+	bool startFlag = false;
+	
 	bool m_playerFacingRight;
 
+	Label* m_pStart;
+	Label* m_pRestart;
+
+
 	// UI Items
-	Button* m_pBackButton;
-	Button* m_pNextButton;
+	//Button* m_pBackButton;
+	//Button* m_pNextButton;
 	Label* m_pInstructionsLabel;
+	
 };
 
 #endif /* defined (__PLAY_SCENE__) */

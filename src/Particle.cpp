@@ -3,7 +3,7 @@
 
 Particle::Particle()
 {
-	TextureManager::Instance().load("../Assets/textures/ship3.png", "particle");
+	TextureManager::Instance().load("../Assets/textures/A1_Cactus.png", "particle");
 
 	auto size = TextureManager::Instance().getTextureSize("particle");
 	setWidth(size.x);
