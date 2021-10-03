@@ -19,29 +19,29 @@ PlayScene::~PlayScene()
 void PlayScene::draw()
 {
 	drawDisplayList();
+
+	SDL_SetRenderDrawColor(Renderer::Instance().getRenderer(), 0, 255, 0, 255);
+	SDL_RenderDrawLine(Renderer::Instance().getRenderer(), xi, yi, xi + 485, yi);
+
+	// ----------------------------
 	SDL_SetRenderDrawColor(Renderer::Instance().getRenderer(), 255, 255, 255, 255);
 }
 
 void PlayScene::update()
 {
+	// pre-calculing varibles
 	float dt = Game::Instance().getDeltaTime();
-	t += dt;
+	t += dt;	// gets a estimate of seconds 
 
 	updateDisplayList();
-
-	xi = m_pParticle->getTransform()->position.x;
-	yi = m_pParticle->getTransform()->position.y;
-
-	xf = xi + vx * dt;
-	yf = yi + vy * dt + 0.5f * g * pow(dt, 2);
-
-	vy += g * dt;
-
-	//y = c + (v * t) + (a * pow(t, 2));
+	
+	
+	//std::cout << t << std::endl;
+	// finding final position
+	xf = xi + Vx * t;
+	yf = yi + Vy * t + g * 0.5f * pow(t, 2);
 
 	m_pParticle->getTransform()->position = glm::vec2(xf, yf);
-
-
 }
 
 void PlayScene::clean()
@@ -67,7 +67,7 @@ void PlayScene::handleEvents()
 	if (EventManager::Instance().isKeyDown(SDL_SCANCODE_2))
 	{
 		TheGame::Instance().changeSceneState(END_SCENE);
-	}
+	}	
 }
 
 void PlayScene::start()
@@ -75,72 +75,25 @@ void PlayScene::start()
 	// Set GUI Title
 	m_guiTitle = "Play Scene";
 	
-	// Plane Sprite
-	//m_pPlaneSprite = new Plane();
-	//addChild(m_pPlaneSprite);
-
-	//// Player Sprite
-	//m_pPlayer = new Player();
-	//addChild(m_pPlayer);
-	//m_playerFacingRight = true;
 
 	m_pParticle = new Particle();
 	addChild(m_pParticle);
 	m_pParticle->getTransform()->position = glm::vec2(100, 400);
-
+	xi = m_pParticle->getTransform()->position.x;
+	yi = m_pParticle->getTransform()->position.y;
 	 
-
-	// Back Button
-	m_pBackButton = new Button("../Assets/textures/backButton.png", "backButton", BACK_BUTTON);
-	m_pBackButton->getTransform()->position = glm::vec2(300.0f, 400.0f);
-	m_pBackButton->addEventListener(CLICK, [&]()-> void
-	{
-		m_pBackButton->setActive(false);
-		TheGame::Instance().changeSceneState(START_SCENE);
-	});
-
-	m_pBackButton->addEventListener(MOUSE_OVER, [&]()->void
-	{
-		m_pBackButton->setAlpha(128);
-	});
-
-	m_pBackButton->addEventListener(MOUSE_OUT, [&]()->void
-	{
-		m_pBackButton->setAlpha(255);
-	});
-	addChild(m_pBackButton);
-
-	// Next Button
-	m_pNextButton = new Button("../Assets/textures/nextButton.png", "nextButton", NEXT_BUTTON);
-	m_pNextButton->getTransform()->position = glm::vec2(500.0f, 400.0f);
-	m_pNextButton->addEventListener(CLICK, [&]()-> void
-	{
-		m_pNextButton->setActive(false);
-		TheGame::Instance().changeSceneState(END_SCENE);
-	});
-
-	m_pNextButton->addEventListener(MOUSE_OVER, [&]()->void
-	{
-		m_pNextButton->setAlpha(128);
-	});
-
-	m_pNextButton->addEventListener(MOUSE_OUT, [&]()->void
-	{
-		m_pNextButton->setAlpha(255);
-	});
-
-	addChild(m_pNextButton);
+	
 
 	/* Instructions Label */
-	m_pInstructionsLabel = new Label("Press the backtick (`) character to toggle Debug View", "Consolas");
+	/*m_pInstructionsLabel = new Label("Press the backtick (`) character to toggle Debug View", "Consolas");
 	m_pInstructionsLabel->getTransform()->position = glm::vec2(Config::SCREEN_WIDTH * 0.5f, 500.0f);
 
-	addChild(m_pInstructionsLabel);
+	addChild(m_pInstructionsLabel);*/
 
 	ImGuiWindowFrame::Instance().setGUIFunction(std::bind(&PlayScene::GUI_Function, this));
 }
 
-void PlayScene::GUI_Function() const
+void PlayScene::GUI_Function()
 {
 	// Always open with a NewFrame
 	ImGui::NewFrame();
@@ -150,7 +103,15 @@ void PlayScene::GUI_Function() const
 	
 	ImGui::Begin("Your Window Title Goes Here", NULL, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoMove);
 
-	if(ImGui::Button("My Button"))
+	ImGui::SliderFloat("Launch Angle", &launchAng, -90.f, 180.0f, "%.1f,");
+	ImGui::SliderFloat("Velocity", &v, 0.f, 100.0f, "%.1f,");
+	//ImGui::SliderFloat("Start Point", &xi, 0.f, 100.0f, "%.1f,");
+	ImGui::SliderFloat("Gravity", &g, -5.0f, 20.0f, "%.1f,");
+
+	ImGui::Separator();
+	ImGui::SliderFloat("Time", &t, -10.f, 100.0f, "%.1f,");
+
+	/*if(ImGui::Button("My Button"))
 	{
 		std::cout << "My Button Pressed" << std::endl;
 	}
@@ -164,7 +125,7 @@ void PlayScene::GUI_Function() const
 		std::cout << float3[1] << std::endl;
 		std::cout << float3[2] << std::endl;
 		std::cout << "---------------------------\n";
-	}
+	}*/
 	
 	ImGui::End();
 }
