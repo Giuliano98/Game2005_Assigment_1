@@ -110,16 +110,16 @@ void PlayScene::start()
 	 
 
 	/* Labels */
-	m_pStart = new Label("Press (S) to start the motion", "Consolas");
-	m_pStart->getTransform()->position = glm::vec2(Config::SCREEN_WIDTH * 0.5f, 300.0f);
+	m_pStart = new Label("Press (S) to start the motion", "Consolas", 20
+		, SDL_Color({ 255, 0, 0, 255 }), glm::vec2(476.0f, 30.0f));
 	addChild(m_pStart);
 
-	m_pRestart = new Label("Press (R) to Restart the level motion", "Consolas");
-	m_pRestart->getTransform()->position = glm::vec2(Config::SCREEN_WIDTH * 0.5f, 200.0f);
+	m_pRestart = new Label("Press (R) to Restart the level motion", "Consolas", 20
+		, SDL_Color({ 255, 0, 0, 255 }), glm::vec2(520.0f, 60.0f));
 	addChild(m_pRestart);
 	
-	m_pInstructionsLabel = new Label("Press (`) to toggle Debug View", "Consolas");
-	m_pInstructionsLabel->getTransform()->position = glm::vec2(Config::SCREEN_WIDTH * 0.5f, 500.0f);
+	m_pInstructionsLabel = new Label("Press (`) to toggle Debug View", "Consolas", 20
+		, SDL_Color({ 255, 0, 0, 255 }), glm::vec2(483.0f, 90.0f));
 	addChild(m_pInstructionsLabel);
 
 	ImGuiWindowFrame::Instance().setGUIFunction(std::bind(&PlayScene::GUI_Function, this));
